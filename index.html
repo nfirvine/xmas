@@ -1,0 +1,77 @@
+<html>
+<head>
+<style>
+label {
+  display: block;
+}
+#answer {
+  font-size: 10em;
+}
+</style>
+<script lang="text/javascript">
+const seed = (new Date()).getFullYear();
+
+const names = (new URLSearchParams(document.location.search)).getAll("name").toSorted();
+
+// yoinked from stackoverflow
+function shuffleArray(array) {
+	var s = seed;
+  function random() {
+      var x = Math.sin(s++) * 10000;
+      return x - Math.floor(x);
+  }
+
+  for (let i = array.length - 1; i > 0; i--) {
+  	var j =  Math.floor(random() * (i + 1));
+    var n = 0;
+    // ensure we don't end up with any entries in the same position
+  	while (array[i] === array[j]) {
+    		n++;
+        console.log(`reshuffles: ${n}`);
+        j = Math.floor(random() * (i + 1));
+    }
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+const namesShuffled = [...names];
+shuffleArray(namesShuffled);
+
+window.addEventListener("load", (event) => {
+	const answerSpan = document.querySelector("#answer");
+  const whoDiv = document.querySelector("#who");
+  for (const name of names) {
+  	const buysFor = namesShuffled[names.indexOf(name)];
+    console.log(`${name} buys for ${buysFor}`)
+  	const input = document.createElement("input", {id: name});
+    input.id = name;
+    input.type = "radio";
+    input.name = "who";
+    input.value = name;
+    input.onchange = (event) => {
+    	answerSpan.innerText = buysFor;
+    };
+    
+    const label = document.createElement("label");
+    label.htmlFor = name;
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(name));
+    whoDiv.appendChild(label);
+  };
+});
+</script>
+</head>
+<body>
+<form>
+  <fieldset>
+    <legend>Who are you? (No cheating)</legend>
+    <div id="who">
+    </div>
+  </fieldset>
+</form>
+
+<div >
+You buy for <span id="answer">???</span>
+</div>
+</body>
+</html>
