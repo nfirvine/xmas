@@ -9,7 +9,10 @@ label {
 }
 </style>
 <script lang="text/javascript">
-const seed = (new Date()).getFullYear();
+var seed = (new URLSearchParams(document.location.search)).get("seed");
+if (seed === null) {
+  seed = (new Date()).getFullYear();
+}
 
 const names = (new URLSearchParams(document.location.search)).getAll("name").toSorted();
 
