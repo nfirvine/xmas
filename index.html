@@ -14,7 +14,21 @@ if (seed === null) {
   seed = (new Date()).getFullYear();
 }
 
-const names = (new URLSearchParams(document.location.search)).getAll("name").toSorted();
+const names = (new URLSearchParams(document.location.search)).getAll("name");
+
+var drop = [];
+
+for (let i = 0; i < names.length; i++) {
+  if (names[i].startsWith("-")) {
+    newName = names[i].slice(1);
+    names[i] = newName;
+    drop.push(newName);
+  }
+}
+
+console.log("drops", drop);
+
+names.sort();
 
 // yoinked from stackoverflow
 function shuffleArray(array) {
@@ -40,13 +54,38 @@ function shuffleArray(array) {
 const namesShuffled = [...names];
 shuffleArray(namesShuffled);
 
+// map who buys for who
+const buysFors = {};
+for (const name of names) {
+  buysFors[name] = namesShuffled[names.indexOf(name)];
+}
+
+// drop all those in drop list
+const buysForsDropped = {};
+for (const name of names) {
+  if (drop.indexOf(name) != -1) {
+    console.log(`drop ${name}`)
+  }
+  let who = buysFors[name]; 
+  console.log(`${name} might buy for ${who}`)
+  while (drop.indexOf(who) != -1) {
+    console.log(`but ${who} is dropped`)
+    who = buysFors[who];
+    console.log(`try ${who} instead`)
+  }
+  buysForsDropped[name] = who;
+  console.log(`${name} buys for ${who}`)
+}
+
 window.addEventListener("load", (event) => {
 	const answerSpan = document.querySelector("#answer");
   const whoDiv = document.querySelector("#who");
   for (const name of names) {
-  	const buysFor = namesShuffled[names.indexOf(name)];
-    console.log(`${name} buys for ${buysFor}`)
-  	const input = document.createElement("input", {id: name});
+    if (drop.indexOf(name) != -1) {
+      continue
+    }
+  	let buysFor = buysForsDropped[name];
+  	let input = document.createElement("input", {id: name});
     input.id = name;
     input.type = "radio";
     input.name = "who";
